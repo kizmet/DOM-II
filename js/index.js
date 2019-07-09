@@ -59,31 +59,70 @@ newA.setAttribute('href', '#0');
 newA.textContent = "Local Trips";
 netInfo.append(newA)
 
-const options = {
-    enableHighAccuracy: true,
-    timeout: 100000,
-    maximumAge: 0
-};
 
-function success(pos) {
-    var crd = pos.coords;
-    alert(`Now showing trips in your location (Longitude: ${crd.longitude} Latitude : ${crd.latitude}`);
-}
 
-function error(err) {
-    console.warn(`ERROR(${err.code}): ${err.message}`);
-}
-
-function geo() {
+function geoLocate() {
+    const status = document.querySelector('#status');
+    const mapLink = document.querySelector('#map-link');
+    const options = {
+        enableHighAccuracy: true,
+        timeout: 100000,
+        maximumAge: 0
+    };
+    mapLink.href = '';
+    mapLink.textContent = '';
+    function success(pos) {
+        const latitude = pos.coords.latitude;
+        const longitude = pos.coords.longitude;
+        status.textContent = '';
+        mapLink.href = `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`;
+        mapLink.textContent = `Latitude: ${latitude} °, Longitude: ${longitude} °`;
+    };
+    function error(err) {
+        console.warn(`ERROR(${err.code}): ${err.message}`);
+    }
     navigator.geolocation.getCurrentPosition(success, error, options);
 }
 
+///OLD CODE
+// const options = {
+//     enableHighAccuracy: true,
+//     timeout: 100000,
+//     maximumAge: 0
+// };
+// function success(pos) {
+//     const crd = pos.coords;
+//     alert(`Now showing trips in your location (Longitude: ${crd.longitude} Latitude : ${crd.latitude}`);
+//     const lat = crd.latitude;
+//     const long = crd.longitude;
+// }
+
+// function error(err) {
+//     console.warn(`ERROR(${err.code}): ${err.message}`);
+// }
+
+// function geo() {
+//     navigator.geolocation.getCurrentPosition(success, error, options);
+// }
+
+function frameMap(argument) {
+    const header = document.querySelector("body > div > header.intro");
+    const mapFrame = document.createElement("iframe");
+    mapFrame.setAttribute('src', 'https://www.openstreetmap.org/#map=18/37.75370/-122.50324');
+    mapFrame.setAttribute('class', 'map');
+    header.append(mapFrame);
+}
+
+document.querySelector("body > div > header")
 const localA = document.querySelector("body > header > div > nav > a.nav-link-local");
 
 localA.addEventListener('click', e => {
     e.stopPropagation;
-    geo();
+    geoLocate();
+    frameMap();
 });
+
+
 
 const contPck = document.querySelector("body > div > section.content-pick");
 const choose = document.createElement("div");
@@ -105,8 +144,9 @@ buttons.forEach(button => {
         // choice()
         e.preventDefault();
         // var title = "Trip added!";
-        var title = e.target.previousSibling.previousSibling.previousSibling.previousSibling.textContent;
-        
+        // var title = e.target.previousSibling.previousSibling.previousSibling.previousSibling.textContent;
+        var title = e.target.parentElement.firstElementChild.textContent;
+
         var trip = document.querySelector("#choose");
         trip.textContent = title;
     })
